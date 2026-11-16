@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>PoC Bidi Swap (Edukasi) - Revisi</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        .box { border: 1px solid #ccc; padding: 15px; margin: 15px 0; background: #f9f9f9; border-radius: 5px; word-break: break-all; }
+        .label { font-weight: bold; margin-bottom: 5px; }
+        .address-bar { background: #fff; border: 2px solid #333; padding: 10px 20px; border-radius: 25px; font-family: monospace; font-size: 15px; display: inline-block; }
+        code { background: #eee; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .warning { color: #d32f2f; font-weight: bold; }
+        .highlight { background-color: #ffeb3b; }
+    </style>
+</head>
+<body>
+
+    <h1>PoC: Bidi Swap (Edukasi)</h1>
+    <p>Halaman ini mendemonstrasikan bagaimana karakter kontrol Unicode <strong>Bidi</strong> (khususnya RLO) dapat membalik urutan tampilan teks.</p>
+
+    <div class="box">
+        <div class="label">1. Teks Asli (Logis):</div>
+        <div id="normal-text"></div>
+    </div>
+
+    <div class="box">
+        <div class="label">2. Demonstrasi Efek Bidi (Visual):</div>
+        <div id="bidi-text" style="font-size: 18px; font-family: monospace;"></div>
+        <p><small>Perhatikan bagaimana urutan huruf berubah secara visual.</small></p>
+    </div>
+
+    <div class="box">
+        <div class="label">3. Simulasi Address Bar Palsu (Lebih Meyakinkan):</div>
+        <div class="address-bar">
+            <span style="color: #666;">🔒 https://</span><span id="fake-url"></span>
+        </div>
+        <p><small>Secara visual terlihat seperti <strong>google.com</strong>, tapi coba blok teks di atas dan copy-paste ke Notepad untuk melihat string aslinya.</small></p>
+    </div>
+
+    <div class="box">
+        <div class="label">4. Kode Karakter yang Digunakan:</div>
+        <p><code>U+202E</code> (Right-to-Left Override / RLO) &mdash; memaksa teks setelahnya ditampilkan dari kanan ke kiri.</p>
+        <p><code>U+202C</code> (Pop Directional Formatting / PDF) &mdash; mengakhiri efek override.</p>
+        <p>String mentah yang disisipkan:</p>
+        <code id="raw-string"></code>
+    </div>
+
+    <div class="box warning">
+        ⚠️ PoC ini hanya untuk edukasi. Browser modern memiliki perlindungan terhadap beberapa bentuk serangan Bidi. Jangan gunakan untuk phishing atau aktivitas ilegal.
+    </div>
+
+    <script>
+        // === KONFIGURASI ===
+        const realDomain = "contoh.domain.com";
+        const fakeVisual = "google.com";
+
+        // Karakter kontrol Bidi
+        const RLO = "\u202E"; // Right-to-Left Override
+        const PDF = "\u202C"; // Pop Directional Formatting
+        
+        document.getElementById('normal-text').textContent = realDomain;
+        
+        const reversed = realDomain.split('').reverse().join('');
+        const bidiString = RLO + reversed + PDF;
+        
+      
+        document.getElementById('bidi-text').textContent = bidiString;
+
+        document.getElementById('raw-string').textContent =
+            Array.from(bidiString).map(ch => {
+                const code = ch.codePointAt(0);
+                return code > 127 ? `\\u${code.toString(16).toUpperCase().padStart(4, '0')}` : ch;
+            }).join('');
+
+      
+        const fakeUrlString = RLO + fakeVisual.split('').reverse().join('') + PDF;
+        document.getElementById('fake-url').textContent = fakeUrlString;
+
+        console.log("String logis asli:", realDomain);
+        console.log("String yang ditampilkan di address bar (visual):", fakeUrlString);
+    </script>
+
+</body>
+</html>
